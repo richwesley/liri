@@ -8,21 +8,38 @@ const keys = require('./keys.js');
 const Twitter = require ('twitter');
 const Spotify = require ('node-spotify-api');
 const request = require ('request');
+const inquirer = require ('inquirer');
 
-//==Global Variables ==
+//Input function
 
-var  byYourCommand = process.argv[2];
-var paramater = process.argv[3];
+inquirer.prompt([
+  {
+    type: "list",
+    name: "userChoice",
+    message: "What would you like to do?",
+    choices: ["my-tweets", "spotify-this-song", "movie-this", "do-what-it-says"]
+  },
+  {
+    type: "input",
+    name: "media",
+    message: "Input your song or movie choice (or <enter>)",
+    default: "default"
+  }
 
+]).then(function(response) {
+ 
+  var command = response.userChoice;
+  var media = response.media;
+  console.log (command, media);
 
-//== switch statement ==
-
-switch (byYourCommand) {
+switch (command) {
     case "my-tweets":
-   tweetCmd();
+
+    tweetCmd();
     break;
 
     case "spotify-this-song":
+     
     musicCmd();
     break;
 
@@ -35,8 +52,10 @@ switch (byYourCommand) {
     break;
 
     default:
-    console.log(byYourCommand + " Is not a valid command");
+    console.log(command + " Is not a valid command");    
 };
+
+})
 
 // == Twitter function ==
 
@@ -49,16 +68,15 @@ function tweetCmd () {
 		if (!error) {
 			for (i = 0; i < tweets.length; i++) {
 
-        console.log('\n');            //modified for loop from 20 to length of my 
+        console.log('\n');                             //modified for loop from 20 to length of my 
 				console.log(tweets[i].text);                   // Twitter timeline so app doesn't crash !!!
 				console.log(tweets[i].user.created_at);
 
         fs.appendFile("logFile", '\n' + tweets[i].text), function (err) {
           if (err) {
             return console.log (err)
-          }
-        }
-				
+          };
+        };		
 			}
 		} else {console.log(error)}
 	})
@@ -68,11 +86,11 @@ function tweetCmd () {
 
 function movieCmd () {
 
-  if (paramater === undefined) {
-    paramater = 'Honky+Tonk+Freeway'   //Couldn't deal with Mr. Nobody, so subed this great classic!
+  if (media  === "default") {
+    media = 'Honky+Tonk+Freeway'   //Couldn't deal with Mr. Nobody, so subed this great classic!
   }
    
-  var queryURL = "http://www.omdbapi.com/?t=" + paramater + "&y=&plot=short&apikey=40e9cece"
+  var queryURL = "http://www.omdbapi.com/?t=" + media + "&y=&plot=short&apikey=40e9cece"
   request(queryURL, function(error, response, body) {
   
     if (!error && response.statusCode === 200) {
@@ -84,7 +102,7 @@ function movieCmd () {
           }
       }
     } else {
-      console.log("Something has gone terriblyy wrong  "+ err)
+      console.log("Something has gone terribly wrong  "+ err)
     }
   });
 };
@@ -94,13 +112,13 @@ function movieCmd () {
 
 function musicCmd () {
 
-  if (paramater === undefined) {
-      paramater = " Ace of Base The Sign"
+  if (media === "default") {
+      media = " Ace of Base The Sign"
   }
 
   var spotify = new Spotify (keys.spotifykeys);
    
-  spotify.search({ type: 'track', query: paramater }, function(err, data) {
+  spotify.search({ type: 'track', query: media }, function(err, data) {
     if (err) {
       return console.log('Error occurred: ' + err);
     }  else  {
@@ -123,8 +141,8 @@ function doitCmd (){
   fs.readFile('random.txt', 'utf8', function (error, data) {
     let doit = [];
     doit = data.split(',');
-    byYourCommand = (doit[0]);
-    paramater = (doit[1]);
+    command = (doit[0]);
+    media = (doit[1]);
      
     musicCmd();
   })
