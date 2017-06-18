@@ -10,6 +10,8 @@ const Spotify = require ('node-spotify-api');
 const request = require ('request');
 const inquirer = require ('inquirer');
 
+var media;
+
 //Input function
 
 inquirer.prompt([
@@ -29,17 +31,15 @@ inquirer.prompt([
 ]).then(function(response) {
  
   var command = response.userChoice;
-  var media = response.media;
-  console.log (command, media);
-
+  media = response.media;
+  
 switch (command) {
     case "my-tweets":
 
     tweetCmd();
     break;
 
-    case "spotify-this-song":
-     
+    case "spotify-this-song": 
     musicCmd();
     break;
 
@@ -94,8 +94,13 @@ function movieCmd () {
   request(queryURL, function(error, response, body) {
   
     if (!error && response.statusCode === 200) {
+
       var movieJSON = JSON.parse(body);
-      console.log ('\n' + 'Title: ' + movieJSON.Title + '\n' + 'Year: ' + movieJSON.Year + '\n' + 'Rating: ' + movieJSON.imdbRating);
+      console.log(movieJSON);
+      console.log ('\n'+ 'Title: ' + movieJSON.Title + '\n' + 'Year: ' + movieJSON.Year + '\n' + 'Rating: ' + movieJSON.imdbRating);
+      console.log('\n' + 'Country: ' + movieJSON.Country + '\n' + 'Language: ' + movieJSON.Language + '\n' + 'Actors: ' + movieJSON.Actors);
+      console.log('\n' + 'Plot: ' + movieJSON.Plot);
+
       fs.appendFile('logFile', '\n' + movieJSON.Title  + ' ' + movieJSON.Year), function (err) {
         if (err) {
             return console.log (err)
@@ -124,7 +129,7 @@ function musicCmd () {
     }  else  {
         var songPick = data.tracks.items[0];
       
-      console.log( '\n' + songPick.album.artists[0].name + '\n' + songPick.name + '\n' + songPick.external_urls.spotify);
+      console.log( '\n' + songPick.album.artists[0].name + '\n' + songPick.album.name + '\n' + songPick.name + '\n' + songPick.external_urls.spotify);
       fs.appendFile('logFile', '\n' +  songPick.album.artists[0].name + ' ' + songPick.name), function (err) {
         if (err) {
             return console.log (err)
