@@ -14,6 +14,7 @@ const request = require ('request');
 var  byYourCommand = process.argv[2];
 var paramater = process.argv[3];
 
+
 //== switch statement ==
 
 switch (byYourCommand) {
@@ -40,16 +41,24 @@ switch (byYourCommand) {
 // == Twitter function ==
 
 function tweetCmd () {
-  console.log ('under construction');
+  
   var twitter = new Twitter (keys.twitterKeys);
   var twittName = {screen_name: "OreoCookieJar"};
 
   twitter.get('statuses/user_timeline', twittName, function(error, tweets, response) {
 		if (!error) {
-			for (i = 0; i < tweets.length; i++) {            //modified for loop from 20 to length of my 
+			for (i = 0; i < tweets.length; i++) {
+
+        console.log('\n');            //modified for loop from 20 to length of my 
 				console.log(tweets[i].text);                   // Twitter timeline so app doesn't crash !!!
 				console.log(tweets[i].user.created_at);
-				console.log(" ");
+
+        fs.appendFile("logFile", '\n' + tweets[i].text), function (err) {
+          if (err) {
+            return console.log (err)
+          }
+        }
+				
 			}
 		} else {console.log(error)}
 	})
@@ -62,21 +71,26 @@ function movieCmd () {
   if (paramater === undefined) {
     paramater = 'Honky+Tonk+Freeway'   //Couldn't deal with Mr. Nobody, so subed this great classic!
   }
-    console.log(paramater);
+   
   var queryURL = "http://www.omdbapi.com/?t=" + paramater + "&y=&plot=short&apikey=40e9cece"
   request(queryURL, function(error, response, body) {
   
     if (!error && response.statusCode === 200) {
       var movieJSON = JSON.parse(body);
-      console.log ('Title: ' + movieJSON.Title + '\n' + 'Year: ' + movieJSON.Year + '\n' + 'Rating: ' + movieJSON.imdbRating);
+      console.log ('\n' + 'Title: ' + movieJSON.Title + '\n' + 'Year: ' + movieJSON.Year + '\n' + 'Rating: ' + movieJSON.imdbRating);
+      fs.appendFile('logFile', '\n' + movieJSON.Title  + ' ' + movieJSON.Year), function (err) {
+        if (err) {
+            return console.log (err)
+          }
+      }
     } else {
       console.log("Something has gone terriblyy wrong  "+ err)
     }
   });
 };
 
-//== Spotify function
 
+//== Spotify function
 
 function musicCmd () {
 
@@ -92,10 +106,16 @@ function musicCmd () {
     }  else  {
         var songPick = data.tracks.items[0];
       
-      console.log(songPick.album.artists[0].name + '\n' + songPick.name + '\n' + songPick.external_urls.spotify);
+      console.log( '\n' + songPick.album.artists[0].name + '\n' + songPick.name + '\n' + songPick.external_urls.spotify);
+      fs.appendFile('logFile', '\n' +  songPick.album.artists[0].name + ' ' + songPick.name), function (err) {
+        if (err) {
+            return console.log (err)
+        }
       }
+    }
   })
 }
+
 
 //== Random Text function ==
 
