@@ -129,9 +129,9 @@ function musicCmd () {
     }  else  {
         var songPick = data.tracks.items[0];
       
-      console.log( '\n' + songPick.album.artists[0].name + '\n' + songPick.album.name + '\n' + songPick.name + '\n' + songPick.external_urls.spotify);
-      fs.appendFile('logFile', '\n' +  songPick.album.artists[0].name + ' ' + songPick.name), function (err) {
-        if (err) {
+        console.log( '\n' + songPick.album.artists[0].name + '\n' + songPick.album.name + '\n' + songPick.name + '\n' + songPick.external_urls.spotify);
+        fs.appendFile('logFile', '\n' +  songPick.album.artists[0].name + ' ' + songPick.name), function (err) {
+          if (err) {
             return console.log (err)
         }
       }
